@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="loader">
+      <img src="Spinner-1s-200px.svg" alt="" />
+    </div>
+    <div class="counter">
+      <div class="youtube">
+        <i class="fab fa-youtube"></i>
+        <div class="count yt-count">0</div>
+        <h4>Subscribers</h4>
+      </div>
+      <div class="instagram">
+        <i class="fab fa-instagram"></i>
+        <div class="count ig-count">0</div>
+        <h4>Followers</h4>
+      </div>
+      <div class="twitter">
+        <i class="fab fa-twitter"></i>
+        <div class="count tw-count">0</div>
+        <h4>Followers</h4>
+      </div>
+    </div>
+
+    <button class="button">Get Data</button>
+    <script
+      src="https://kit.fontawesome.com/7577eba8ec.js"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const button = document.querySelector("button");
+      const ytCount = document.querySelector(".yt-count");
+      const igCount = document.querySelector(".ig-count");
+      const twCount = document.querySelector(".tw-count");
+      const loader = document.querySelector(".loader");
+      const counters = document.querySelectorAll(".count");
+
+      button.addEventListener("click", requestData);
+
+      function requestData() {
+        console.log("button clicked");
+        loader.style.display = "block";
+        button.disabled = true;
+        //Create XHR Object
+        let xhr = new XMLHttpRequest();
+        // OPEN - type, url/file, async
+        xhr.open("POST", "/", true);
+
+        //Used for loading gifs
+        // xhr.onprogress = function () {
+        //   console.log(xhr.readyState);
+        // };
+
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // used instead of readystatechange
+        xhr.onload = function () {
+          if (this.status == 200) {
+            let data = JSON.parse(this.responseText);
+            console.log(data);
+            ytCount.setAttribute("data-target", data.YTCount);
+            igCount.setAttribute("data-target", data.instaCount);
+            twCount.setAttribute("data-target", data.twitterCount);
+            loader.style.display = "none";
+            button.disabled = false;
+            animateCounters();
+          } else {
+            console.log("Something went wrong");
+          }
+        };
+
+        //error handling
+        xhr.onerror = function () {
+          console.log("request error");
+        };
+
+        //sends request
+        // let string = JSON.stringify({ conor: "fuck" });
+        // console.log(string);
+        xhr.send();
+      }
+
+      function animateCounters() {
+        let speed = 50;
+        counters.forEach((counter) => {
+          counter.innerText = 0;
+          const target = +counter.getAttribute("data-target");
+          const updateCounter = () => {
+            let count = +counter.innerText;
+            let inc = target / speed;
+
+            if (count < target) {
+              counter.innerText = Math.floor(count + inc);
+              setTimeout(updateCounter, 20);
+            } else {
+              counter.innerText = target;
+            }
+          };
+          updateCounter();
+        });
+      }
+    </script>
+  </body>
+</html>
